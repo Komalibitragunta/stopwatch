@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stopwatch Web Application</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #100a0a;
+            margin: 0;
+        }
+
+        .stopwatch-container {
+            text-align: center;
+            background-color: rgb(249, 246, 246);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .time {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+
+        .buttons {
+            margin-bottom: 20px;
+        }
+
+        .buttons button {
+            padding: 10px 20px;
+            font-size: 18px;
+            margin: 0 10px;
+            cursor: pointer;
+        }
+
+        .laps {
+            margin-top: 20px;
+        }
+
+        .laps ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .laps ul li {
+            font-size: 20px;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="stopwatch-container">
+        <div class="time" id="display">00:00:00</div>
+        <div class="buttons">
+            <button id="startStopBtn">Start</button>
+            <button id="lapBtn" disabled>Lap</button>
+            <button id="resetBtn" disabled>Reset</button>
+        </div>
+        <div class="laps">
+            <ul id="laps"></ul>
+        </div>
+    </div>
+
+    <script>
+        let startTime = 0;
+        let elapsedTime = 0;
+        let intervalId;
+        let isRunning = false;
+
+        const display = document.getElementById('display');
+        const startStopBtn = document.getElementById('startStopBtn');
+        const lapBtn = document.getElementById('lapBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const laps = document.getElementById('laps');
+
+        function startStop() {
+            if (!isRunning) {
+                startTime = Date.now() - elapsedTime;
+                intervalId = setInterval(updateTime, 10);
+                isRunning = true;
+                startStopBtn.textContent = 'Pause';
+                lapBtn.disabled = false;
+                resetBtn.disabled = true;
+            } else {
+                clearInterval(intervalId);
+                isRunning = false;
+                startStopBtn.textContent = 'Start';
+                lapBtn.disabled = true;
+                resetBtn.disabled = false;
+            }
+        }
+
+        function updateTime() {
+            elapsedTime = Date.now() - startTime;
+            const time = new Date(elapsedTime);
+            const minutes = Math.floor(elapsedTime / 60000).toString().padStart(2, '0');
+            const seconds = Math.floor((elapsedTime % 60000) / 1000).toString().padStart(2, '0');
+            const milliseconds = Math.floor((elapsedTime%1000) / 10).toString().padStart(2, '0');
+            display.textContent = `${minutes}:${seconds}:${milliseconds}`;
+        }
+
+        function reset() {
+            clearInterval(intervalId);
+            isRunning = false;
+            elapsedTime = 0;
+            display.textContent = '00:00:00';
+            startStopBtn.textContent = 'Start';
+            lapBtn.disabled = true;
+            resetBtn.disabled = true;
+            laps.innerHTML = '';
+        }
+
+        function lap() {
+            const lapTime = display.textContent;
+            const li = document.createElement('li');
+            li.textContent = `Lap ${laps.childElementCount + 1}: ${lapTime}`;
+            laps.appendChild(li);
+        }
+
+        startStopBtn.addEventListener('click', startStop);
+        resetBtn.addEventListener('click', reset);
+        lapBtn.addEventListener('click', lap);
+    </script>
+
+</body>
+</html>
